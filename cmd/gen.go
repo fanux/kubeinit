@@ -17,6 +17,7 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/fanux/kubeinit/define"
 	"github.com/spf13/cobra"
 )
 
@@ -36,6 +37,7 @@ func init() {
 
 	// Here you will define your flags and configuration settings.
 
+	genCmd.Flags().StringSliceVar(&define.EtcdEndPoints, "etcd", []string{"http://localhost:2375"}, "etcd endpoints")
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// genCmd.PersistentFlags().String("foo", "", "A help for foo")
