@@ -25,12 +25,19 @@ var showCluster = ` cluster overview >
                  |
                  V 
      +------------------------+ join
-     | LB  10.1.245.94        | <--- Nodes
+     | LB  10.1.245.94 haproxy| <--- Nodes
      +------------------------+
      |                                                   
      |--master1 manager1 schedule1   10.1.245.93                                                
      |--master2 manager2 schedule2   10.1.245.95    =============>  etcd cluster  http://10.1.245.93:2379,http://10.1.245.94:2379,http://10.1.245.95:2379
-     |--master3 manager3 schedule3   10.1.245.94   
+     +--master3 manager3 schedule3   10.1.245.94   
+
+
+   +---------------------------------+
+   | qq群：98488045                  | 
+   | phone NO. 15357921248           | 
+   | Email: lamelegdog@gmail.com     |
+   +---------------------------------+
 `
 
 func main() {

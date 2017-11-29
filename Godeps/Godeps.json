@@ -1,0 +1,94 @@
+{
+	"ImportPath": "github.com/fanux/kubeinit",
+	"GoVersion": "go1.6",
+	"GodepVersion": "v79",
+	"Deps": [
+		{
+			"ImportPath": "github.com/BurntSushi/toml",
+			"Comment": "v0.2.0-9-gf0aeabc",
+			"Rev": "f0aeabca5a127c4078abb8c8d64298b147264b55"
+		},
+		{
+			"ImportPath": "github.com/fsnotify/fsnotify",
+			"Comment": "v1.3.0",
+			"Rev": "30411dbcefb7a1da7e84f75530ad3abe4011b4f8"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/hcl",
+			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/hcl/hcl/ast",
+			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/hcl/hcl/parser",
+			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/hcl/hcl/scanner",
+			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/hcl/hcl/strconv",
+			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/hcl/hcl/token",
+			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/hcl/json/parser",
+			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/hcl/json/scanner",
+			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
+		},
+		{
+			"ImportPath": "github.com/hashicorp/hcl/json/token",
+			"Rev": "9a905a34e6280ce905da1a32344b25e81011197a"
+		},
+		{
+			"ImportPath": "github.com/inconshreveable/mousetrap",
+			"Rev": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
+		},
+		{
+			"ImportPath": "github.com/magiconair/properties",
+			"Comment": "v1.7.0",
+			"Rev": "c265cfa48dda6474e208715ca93e987829f572f8"
+		},
+		{
+			"ImportPath": "github.com/mitchellh/mapstructure",
+			"Rev": "740c764bc6149d3f1806231418adb9f52c11bcbf"
+		},
+		{
+			"ImportPath": "github.com/spf13/cast",
+			"Rev": "27b586b42e29bec072fe7379259cc719e1289da6"
+		},
+		{
+			"ImportPath": "github.com/spf13/cobra",
+			"Rev": "4c05eb1145f16d0e6bb4a3e1b6d769f4713cb41f"
+		},
+		{
+			"ImportPath": "github.com/spf13/jwalterweatherman",
+			"Rev": "33c24e77fb80341fe7130ee7c594256ff08ccc46"
+		},
+		{
+			"ImportPath": "github.com/spf13/pflag",
+			"Rev": "08b1a584251b5b62f458943640fc8ebd4d50aaa5"
+		},
+		{
+			"ImportPath": "github.com/spf13/viper",
+			"Rev": "c1ccc378a054ea8d4e38d8c67f6938d4760b53dd"
+		},
+		{
+			"ImportPath": "golang.org/x/sys/unix",
+			"Rev": "833a04a10549a95dc34458c195cbad61bbb6cb4d"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "a83829b6f1293c91addabc89d0571c246397bbf4"
+		}
+	]
+}
