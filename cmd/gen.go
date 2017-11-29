@@ -19,11 +19,15 @@ import (
 	"html/template"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"strconv"
+	"strings"
 
 	"github.com/fanux/kubeinit/define"
 	"github.com/spf13/cobra"
 )
+
+var outDir = "out"
 
 //WriteFile is
 func WriteFile(fileName string, content string) {
@@ -41,12 +45,6 @@ func FileExists(file string) bool {
 	}
 	return false
 
-}
-
-//GenEtcdYaml iko
-func GenEtcdYaml(endpoint, endpoints, template string) (out string) {
-	//TODO
-	return
 }
 
 // infra0=http://10.1.245.93:2380,infra1=http://10.1.245.94:2380,infra2=http://10.1.245.95:2380
@@ -91,20 +89,47 @@ func genEtcdyamls(etcdIPs []string, tp string) {
 		etcd.EndPoint = ip
 		etcd.Index = strconv.Itoa(i)
 
-		etcdComposeFileNmae = fmt.Sprintf("etcd-docker-compose-%d.yml", i)
+		etcdComposeFileNmae = fmt.Sprintf("out/etcd-docker-compose-%d.yml", i)
 		t := template.New("etcd")
 
 		Render(t, tp, etcd, etcdComposeFileNmae)
 	}
 }
 
-func genKubeAdmConfigFile(etcdIPs []string, masterIPs []string, loadbalanceIP string, loadbalancePort string, template string) {
+func genKubeAdmConfigFile(etcdIPs []string, masterIPs []string, loadbalanceIP string, loadbalancePort string, subnet string, version string, tp string) {
+	kubeadm := define.KubeadmTempST{}
+	kubeadm.APIServerCertSANs = append(masterIPs, loadbalanceIP)
+	kubeadm.EtcdEndPoints = etcdIPs
+	kubeadm.PodSubnet = subnet
+	kubeadm.KubernetesVersion = version
+
+	t := template.New("kubeadmConfig")
+	Render(t, tp, kubeadm, "out/kubeadm.yaml")
 }
 
-func genLoadbalanceConfigFile(loadbalanceIP string, loadbalancePort string, masterIPs []string, haproxyTemp string) {
+func genLoadbalanceConfigFile(loadbalancePort string, masterIPs []string, tp string) {
+	haproxy := define.HaproxyTempST{
+		loadbalancePort,
+		masterIPs}
+
+	t := template.New("haproxy")
+	Render(t, tp, haproxy, "out/haproxy.cfg")
 }
 
-func genKubeletSystemdConfig(kubeletSystemdTemp string) {
+func genKubeletSystemdConfig(tp string) {
+	driver := "cgroupfs"
+	out, err := exec.Command("docker", "info").Output()
+	outstr := string(out)
+	if err != nil {
+		fmt.Println("run docker info error: ", err)
+	}
+	if strings.Contains(outstr, "cgroupfs") {
+	} else if strings.Contains(outstr, "systemd") {
+		driver = "systemd"
+	}
+
+	t := template.New("systemdConfig")
+	Render(t, tp, driver, "out/10-kubeadm.conf")
 }
 
 // genCmd represents the gen command
@@ -114,13 +139,18 @@ var genCmd = &cobra.Command{
 	Long:  `you can generate it then apply it, if using apply will generate configs if not exist`,
 	Run: func(cmd *cobra.Command, args []string) {
 		genEtcdyamls(define.EtcdIPs, define.EtcdComposeTemp)
-		//genKubeAdmConfigFile(define.EtcdIPs, define.MasterIPs, define.LoadbalanceIP, define.LoadbalancePort, define.KubeadmTemp)
-		//genLoadbalanceConfigFile(define.LoadbalanceIP, define.LoadbalancePort, define.MasterIPs, define.HaproxyTemp)
-		//genKubeletSystemdConfig(define.KubeletSystemdTemp)
+		genKubeAdmConfigFile(define.EtcdIPs, define.MasterIPs, define.LoadbalanceIP, define.LoadbalancePort, define.Subnet, define.Version, define.KubeadmTemp)
+		genLoadbalanceConfigFile(define.LoadbalancePort, define.MasterIPs, define.HaproxyTemp)
+		genKubeletSystemdConfig(define.KubeletSystemdTemp)
 	},
 }
 
 func init() {
+	err := os.Mkdir(outDir, os.ModePerm)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	RootCmd.AddCommand(genCmd)
 
 	// Here you will define your flags and configuration settings.
@@ -131,6 +161,8 @@ func init() {
 	genCmd.Flags().StringVar(&define.LoadbalancePort, "loadbalance-port", ":6444", "loadbalance port")
 	genCmd.Flags().StringVar(&define.EtcdImage, "etcd-image", "gcr.io/google_containers/etcd-amd64:3.0.17", "etcd docker image")
 	genCmd.Flags().BoolVarP(&define.Apply, "apply", "a", false, "apply directly")
+	genCmd.Flags().StringVar(&define.Subnet, "pod-subnet", "10.122.0.0/16", "pod subnet")
+	genCmd.Flags().StringVar(&define.Version, "version", "v1.8.4", "kubernetes version")
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// genCmd.PersistentFlags().String("foo", "", "A help for foo")

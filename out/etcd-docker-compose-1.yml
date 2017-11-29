@@ -1,0 +1,20 @@
+version: '2.1'
+services:
+    etcd1:
+        container_name: etcd_infra1
+        image: gcr.io/google_containers/etcd-amd64:3.0.17
+        command: |
+                etcd --name infra1
+                --initial-advertise-peer-urls http://192.168.0.3:2380
+                --listen-peer-urls http://192.168.0.3:2380
+                --listen-client-urls http://192.168.0.3:2379,http://127.0.0.1:2379
+                --advertise-client-urls http://192.168.0.3:2379
+                --data-dir /etcd-data.etcd
+                --initial-cluster-token etcd-cluster-1
+                --initial-cluster infra0=http://192.168.0.2:2380,infra1=http://192.168.0.3:2380,infra2=http://192.168.0.4:2380
+                --initial-cluster-state new
+        restart: always
+        volumes:
+           - /data/etcd-data.etcd:/etcd-data.etcd
+        network_mode: "host"
+

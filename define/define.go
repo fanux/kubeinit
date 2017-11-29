@@ -35,14 +35,10 @@ type EtcdComposeTempST struct {
 var KubeadmTemp = `apiVersion: kubeadm.k8s.io/v1alpha1
 kind: MasterConfiguration
 apiServerCertSANs:
-{{range .APIServerCertSANs}}
-- {{.}} {{'\n'}}
-{{end}}
+{{range .APIServerCertSANs}}- {{.}} {{"\n"}}{{end}}
 etcd:
   endpoints:
-  {{range .EtcdEndPoints}}
-  - {{.}} {{'\n'}}
-  {{end}}
+{{range .EtcdEndPoints}}  - http://{{.}}:2379  {{"\n"}}{{end}}
 networking:
   podSubnet: {{.PodSubnet}}
 kubernetesVersion: {{.KubernetesVersion}}
@@ -93,9 +89,7 @@ frontend k8s
 backend k8s-backend
   balance roundrobin
   mode tcp
-  {{range $index, $element := .BackendEndPoint}}
-  server k8s-{{$index}} {{$element}} check {{'\n'}}
-  {{end}}
+{{range $index, $element := .BackendEndPoint}}  server k8s-{{$index}} {{$element}}:6443 check {{"\n"}}{{end}}
 `
 
 //HaproxyTempST is
@@ -116,6 +110,8 @@ var (
 	LoadbalanceIP     string
 	Apply             bool
 	EtcdImage         string
+	Version           string
+	Subnet            string
 
 	// render out compose file and kubeadm config
 	ConfigOutDir string
