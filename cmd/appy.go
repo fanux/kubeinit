@@ -47,7 +47,7 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// appyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	appyCmd.Flags().BoolVarP(&define.KubeFlags.InitBaseEnvironment, "init-base-env", "b", false, "init base environment, close firewalld selinux swap, copy bin and configs, load docker images")
-	appyCmd.Flags().BoolVarP(&define.KubeFlags.InitKubeadm, "init-kubeadm", "i", false, "exec kubeadm init")
-	appyCmd.Flags().BoolVarP(&define.KubeFlags.StartEtcdCluster, "start-etcd", "e", false, "docker compose up etcd compose files")
+	appyCmd.Flags().BoolVarP(&define.InitBaseEnvironment, "init-base-env", "b", false, "init base environment, close firewalld selinux swap, copy bin and configs, load docker images")
+	appyCmd.Flags().BoolVarP(&define.InitKubeadm, "init-kubeadm", "i", false, "exec kubeadm init")
+	appyCmd.Flags().BoolVarP(&define.StartEtcdCluster, "start-etcd", "e", false, "docker compose up etcd compose files")
 }

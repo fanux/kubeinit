@@ -78,13 +78,13 @@ func applyShell(sh string) {
 func Apply() {
 	LoadKubeinitConfig()
 
-	if define.KubeFlags.InitBaseEnvironment {
+	if define.InitBaseEnvironment {
 		applyShell(initbasesh)
 		applyShell(cpBinAndConfigs)
 		applyShell(loadDockerImages)
 	}
 
-	if define.KubeFlags.StartEtcdCluster {
+	if define.StartEtcdCluster {
 		for i, ip := range define.KubeFlags.EtcdIPs {
 			sh := fmt.Sprintf(startEtcdCluster, ip, i)
 			fmt.Println("apply etcd: ", sh)
@@ -92,7 +92,7 @@ func Apply() {
 		}
 	}
 
-	if define.KubeFlags.InitKubeadm {
+	if define.InitKubeadm {
 		applyShell(initKubeadm)
 	}
 }

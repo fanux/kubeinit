@@ -117,12 +117,14 @@ type Flags struct {
 	ConfigOutDir string
 	// /etc/kubernetes files, this need copy to other nodes, and change ips
 	KubernetesDir string
+}
+
+//KubeFlags is
+var (
+	KubeFlags Flags
 
 	InitBaseEnvironment bool
 	InitKubeadm         bool
 	InitOtherMasters    bool
 	StartEtcdCluster    bool
-}
-
-//KubeFlags is
-var KubeFlags Flags
+)
