@@ -98,8 +98,8 @@ type HaproxyTempST struct {
 	BackendEndPoint []string
 }
 
-//define is
-var (
+//Flags is
+type Flags struct {
 	MasterIPs         []string
 	EtcdIPs           []string
 	MasterEndPoints   []string
@@ -117,4 +117,11 @@ var (
 	ConfigOutDir string
 	// /etc/kubernetes files, this need copy to other nodes, and change ips
 	KubernetesDir string
-)
+
+	InitBaseEnvironment bool
+	InitKubeadm         bool
+	InitOtherMasters    bool
+}
+
+//KubeFlags is
+var KubeFlags Flags

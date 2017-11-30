@@ -17,6 +17,8 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/fanux/kubeinit/define"
+	"github.com/fanux/kubeinit/pkg"
 	"github.com/spf13/cobra"
 )
 
@@ -29,6 +31,7 @@ var appyCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// TODO: Work your own magic here
 		fmt.Println("appy called")
+		pkg.Apply()
 	},
 }
 
@@ -44,5 +47,5 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// appyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	// genCmd.Flags().BoolVarP(&define.InitBaseEnvironment, "init-base-env", "b", false, "init base environment, close firewalld selinux swap, copy bin and configs, load docker images")
+	genCmd.Flags().BoolVarP(&define.KubeFlags.InitBaseEnvironment, "init-base-env", "b", false, "init base environment, close firewalld selinux swap, copy bin and configs, load docker images")
 }

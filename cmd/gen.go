@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"os"
@@ -72,7 +73,7 @@ func genEtcdyamls(etcdIPs []string, tp string) {
 
 	etcd := define.EtcdComposeTempST{}
 	etcd.EndPoints = getEtcdEndpoints(etcdIPs)
-	etcd.Image = define.EtcdImage
+	etcd.Image = define.KubeFlags.EtcdImage
 
 	for i, ip := range etcdIPs {
 		etcd.EndPoint = ip
@@ -137,16 +138,34 @@ func genKubeletSystemdConfig(tp string) {
 	Render(t, tp, driver, outfile)
 }
 
+func dumpKubeInitConfig(flags define.Flags) {
+	fileName := fmt.Sprintf("%s/kubeinit.json", outDir)
+	output, err := os.Create(fileName)
+	if err != nil {
+		fmt.Printf("An error occurred on opening the inputfile\n" +
+			"Does the file exist?\n" +
+			"Have you got acces to it?\n")
+		return // exit the function on error
+	}
+	defer output.Close()
+	json.NewEncoder(output).Encode(&flags)
+	//json.NewDecoder(os.Stdin)Decode(&flags)
+}
+
 // genCmd represents the gen command
 var genCmd = &cobra.Command{
 	Use:   "gen",
 	Short: "generate config files, include etcd docker compose file and kubeadm config file",
 	Long:  `you can generate it then apply it, if using apply will generate configs if not exist`,
 	Run: func(cmd *cobra.Command, args []string) {
-		genEtcdyamls(define.EtcdIPs, define.EtcdComposeTemp)
-		genKubeAdmConfigFile(define.EtcdIPs, define.MasterIPs, define.LoadbalanceIP, define.LoadbalancePort, define.Subnet, define.Version, define.KubeadmTemp)
-		genLoadbalanceConfigFile(define.LoadbalancePort, define.MasterIPs, define.HaproxyTemp)
+		genEtcdyamls(define.KubeFlags.EtcdIPs, define.EtcdComposeTemp)
+		genKubeAdmConfigFile(define.KubeFlags.EtcdIPs, define.KubeFlags.MasterIPs, define.KubeFlags.LoadbalanceIP,
+			define.KubeFlags.LoadbalancePort, define.KubeFlags.Subnet, define.KubeFlags.Version, define.KubeadmTemp)
+		genLoadbalanceConfigFile(define.KubeFlags.LoadbalancePort, define.KubeFlags.MasterIPs, define.HaproxyTemp)
 		genKubeletSystemdConfig(define.KubeletSystemdTemp)
+
+		//kubeinit appy needs this arguments
+		dumpKubeInitConfig(define.KubeFlags)
 	},
 }
 
@@ -160,14 +179,14 @@ func init() {
 
 	// Here you will define your flags and configuration settings.
 
-	genCmd.Flags().StringSliceVar(&define.EtcdIPs, "etcd", []string{"127.0.0.1"}, "etcd ips")
-	genCmd.Flags().StringSliceVar(&define.MasterIPs, "master", []string{"127.0.0.1"}, "master ips")
-	genCmd.Flags().StringVar(&define.LoadbalanceIP, "loadbalance", "127.0.0.1", "loadbalance ip")
-	genCmd.Flags().StringVar(&define.LoadbalancePort, "loadbalance-port", ":6444", "loadbalance port")
-	genCmd.Flags().StringVar(&define.EtcdImage, "etcd-image", "gcr.io/google_containers/etcd-amd64:3.0.17", "etcd docker image")
-	genCmd.Flags().BoolVarP(&define.Apply, "apply", "a", false, "apply directly")
-	genCmd.Flags().StringVar(&define.Subnet, "pod-subnet", "10.122.0.0/16", "pod subnet")
-	genCmd.Flags().StringVar(&define.Version, "version", "v1.8.4", "kubernetes version")
+	genCmd.Flags().StringSliceVar(&define.KubeFlags.EtcdIPs, "etcd", []string{"127.0.0.1"}, "etcd ips")
+	genCmd.Flags().StringSliceVar(&define.KubeFlags.MasterIPs, "master", []string{"127.0.0.1"}, "master ips")
+	genCmd.Flags().StringVar(&define.KubeFlags.LoadbalanceIP, "loadbalance", "127.0.0.1", "loadbalance ip")
+	genCmd.Flags().StringVar(&define.KubeFlags.LoadbalancePort, "loadbalance-port", ":6444", "loadbalance port")
+	genCmd.Flags().StringVar(&define.KubeFlags.EtcdImage, "etcd-image", "gcr.io/google_containers/etcd-amd64:3.0.17", "etcd docker image")
+	genCmd.Flags().BoolVarP(&define.KubeFlags.Apply, "apply", "a", false, "apply directly")
+	genCmd.Flags().StringVar(&define.KubeFlags.Subnet, "pod-subnet", "10.122.0.0/16", "pod subnet")
+	genCmd.Flags().StringVar(&define.KubeFlags.Version, "version", "v1.8.4", "kubernetes version")
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// genCmd.PersistentFlags().String("foo", "", "A help for foo")
