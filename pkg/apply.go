@@ -35,7 +35,7 @@ var loadDockerImages = `
 docker load -i images.tar
 `
 
-var startEtcdCluster = "docker-compose -H %s:2375 -f out/etcd-docker-compose-%d.yml"
+var startEtcdCluster = "docker-compose -H %s:2375 -f out/etcd-docker-compose-%d.yml up -d"
 
 var initKubeadm = `
 kubeadm init --config out/kubeadm.yaml
