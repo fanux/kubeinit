@@ -8,7 +8,7 @@ $ kubeinit gen --master 1.1.1.2 --master 1.1.1.3 --master 1.1.1.4 \
                --loadbalance 1.1.1.2 --apply
 ```
 
-## install etcd and master
+## install etcd and masters
 ```
 $ kubeinit apply
 ```
