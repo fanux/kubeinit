@@ -17,7 +17,6 @@ package cmd
 import (
 	"fmt"
 	"html/template"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strconv"
@@ -29,22 +28,12 @@ import (
 
 var outDir = "out"
 
-//WriteFile is
-func WriteFile(fileName string, content string) {
-	b := []byte(content)
-	err := ioutil.WriteFile(fileName, b, 0644)
-	if err != nil {
-		fmt.Println("write file error", err)
-	}
-}
-
 //FileExists is
 func FileExists(file string) bool {
 	if _, err := os.Stat(file); !os.IsNotExist(err) {
 		return true
 	}
 	return false
-
 }
 
 // infra0=http://10.1.245.93:2380,infra1=http://10.1.245.94:2380,infra2=http://10.1.245.95:2380
@@ -89,22 +78,36 @@ func genEtcdyamls(etcdIPs []string, tp string) {
 		etcd.EndPoint = ip
 		etcd.Index = strconv.Itoa(i)
 
-		etcdComposeFileNmae = fmt.Sprintf("out/etcd-docker-compose-%d.yml", i)
+		etcdComposeFileNmae = fmt.Sprintf("%s/etcd-docker-compose-%d.yml", outDir, i)
 		t := template.New("etcd")
 
 		Render(t, tp, etcd, etcdComposeFileNmae)
 	}
 }
 
+func stringsIn(s []string, key string) bool {
+	for _, i := range s {
+		if i == key {
+			return true
+		}
+	}
+	return false
+}
+
 func genKubeAdmConfigFile(etcdIPs []string, masterIPs []string, loadbalanceIP string, loadbalancePort string, subnet string, version string, tp string) {
 	kubeadm := define.KubeadmTempST{}
-	kubeadm.APIServerCertSANs = append(masterIPs, loadbalanceIP)
+	if stringsIn(masterIPs, loadbalanceIP) {
+		kubeadm.APIServerCertSANs = masterIPs
+	} else {
+		kubeadm.APIServerCertSANs = append(masterIPs, loadbalanceIP)
+	}
 	kubeadm.EtcdEndPoints = etcdIPs
 	kubeadm.PodSubnet = subnet
 	kubeadm.KubernetesVersion = version
 
 	t := template.New("kubeadmConfig")
-	Render(t, tp, kubeadm, "out/kubeadm.yaml")
+	outfile := fmt.Sprintf("%s/kubeadm.yaml", outDir)
+	Render(t, tp, kubeadm, outfile)
 }
 
 func genLoadbalanceConfigFile(loadbalancePort string, masterIPs []string, tp string) {
@@ -113,7 +116,8 @@ func genLoadbalanceConfigFile(loadbalancePort string, masterIPs []string, tp str
 		masterIPs}
 
 	t := template.New("haproxy")
-	Render(t, tp, haproxy, "out/haproxy.cfg")
+	outfile := fmt.Sprintf("%s/haproxy.cfg", outDir)
+	Render(t, tp, haproxy, outfile)
 }
 
 func genKubeletSystemdConfig(tp string) {
@@ -129,7 +133,8 @@ func genKubeletSystemdConfig(tp string) {
 	}
 
 	t := template.New("systemdConfig")
-	Render(t, tp, driver, "out/10-kubeadm.conf")
+	outfile := fmt.Sprintf("%s/10-kubeadm.conf", outDir)
+	Render(t, tp, driver, outfile)
 }
 
 // genCmd represents the gen command

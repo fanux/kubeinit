@@ -44,5 +44,5 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// appyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	genCmd.Flags().BoolVarP(&define.InitBaseEnvironment, "init-base-env", "b", false, "init base environment, close firewalld selinux swap, copy bin and configs, load docker images")
+	// genCmd.Flags().BoolVarP(&define.InitBaseEnvironment, "init-base-env", "b", false, "init base environment, close firewalld selinux swap, copy bin and configs, load docker images")
 }
