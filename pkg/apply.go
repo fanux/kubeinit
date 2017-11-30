@@ -32,7 +32,7 @@ systemctl enable docker
 `
 
 var loadDockerImages = `
-docker load -i images.tar
+docker load -i image/images.tar
 `
 
 var startEtcdCluster = "docker-compose -H %s:2375 -f out/etcd-docker-compose-%d.yml up -d"
