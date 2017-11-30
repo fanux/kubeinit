@@ -23,7 +23,7 @@ import (
 )
 
 // appyCmd represents the appy command
-var appyCmd = &cobra.Command{
+var applyCmd = &cobra.Command{
 	Use:   "apply",
 	Short: "init env and appy kubeadmin init",
 	Long: `初始化环境，拷贝bin程序，配置文件，加载镜像，执行kubeadm, 初始化其它节点
@@ -36,7 +36,7 @@ var appyCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(appyCmd)
+	RootCmd.AddCommand(applyCmd)
 
 	// Here you will define your flags and configuration settings.
 
