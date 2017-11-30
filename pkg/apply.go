@@ -34,6 +34,9 @@ systemctl enable docker
 var loadDockerImages = `
 docker load -i images.tar
 `
+
+var startEtcdCluster = "docker-compose -H %s:2375 -f out/etcd-docker-compose-%d.yml"
+
 var initKubeadm = `
 kubeadm init --config out/kubeadm.yaml
 mkdir -p $HOME/.kube
@@ -78,5 +81,15 @@ func Apply() {
 		applyShell(cpBinAndConfigs)
 		applyShell(loadDockerImages)
 	}
-	applyShell(initKubeadm)
+
+	if define.KubeFlags.StartEtcdCluster {
+		for i, ip := range define.KubeFlags.EtcdIPs {
+			sh := fmt.Sprintf(startEtcdCluster, ip, i)
+			applyShell(sh)
+		}
+	}
+
+	if define.KubeFlags.InitKubeadm {
+		applyShell(initKubeadm)
+	}
 }

@@ -121,6 +121,7 @@ type Flags struct {
 	InitBaseEnvironment bool
 	InitKubeadm         bool
 	InitOtherMasters    bool
+	StartEtcdCluster    bool
 }
 
 //KubeFlags is
