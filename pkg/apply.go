@@ -76,6 +76,8 @@ func applyShell(sh string) {
 
 //Apply is
 func Apply() {
+	LoadKubeinitConfig()
+
 	if define.KubeFlags.InitBaseEnvironment {
 		applyShell(initbasesh)
 		applyShell(cpBinAndConfigs)
