@@ -85,6 +85,7 @@ func Apply() {
 	if define.KubeFlags.StartEtcdCluster {
 		for i, ip := range define.KubeFlags.EtcdIPs {
 			sh := fmt.Sprintf(startEtcdCluster, ip, i)
+			fmt.Println("apply etcd: ", sh)
 			applyShell(sh)
 		}
 	}
