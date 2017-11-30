@@ -1,3 +1,3 @@
-./kubeinit gen --master 192.168.0.2 --master 192.168.0.3 --master 192.168.0.4 \
-    --etcd 192.168.0.2 --etcd 192.168.0.3 --etcd 192.168.0.4 \
-    --loadbalance 192.168.0.2
+./kubeinit gen --master 10.1.245.93 --master 10.1.245.92  --master 10.1.245.95  \
+    --etcd  10.1.245.93  --etcd 10.1.245.92 --etcd 10.1.245.95 \
+    --loadbalance 10.1.245.93 
