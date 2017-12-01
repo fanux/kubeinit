@@ -7,6 +7,7 @@ $ kubeinit gen --master 1.1.1.2 --master 1.1.1.3 --master 1.1.1.4 \
                --etcd  1.1.1.2 --etcd 1.1.1.3 --etcd 1.1.1.4 \
                --loadbalance 1.1.1.2 --apply
 ```
+--apply 生成配置立即执行 kubeinit apply, 不加这个参数只生成一些配置文件，方便定制需求去修改配置，修改完再apply
 
 ## install etcd and masters
 ```
