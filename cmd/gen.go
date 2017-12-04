@@ -102,6 +102,13 @@ func genKubeAdmConfigFile(etcdIPs []string, masterIPs []string, loadbalanceIP st
 	} else {
 		kubeadm.APIServerCertSANs = append(masterIPs, loadbalanceIP)
 	}
+	//add other cert sans ips to APIServerCertSANs list
+	for _, ip := range define.KubeFlags.OtherAPIServerCertSANs {
+		if stringsIn(kubeadm.APIServerCertSANs, ip) {
+		} else {
+			kubeadm.APIServerCertSANs = append(kubeadm.APIServerCertSANs, ip)
+		}
+	}
 	kubeadm.EtcdEndPoints = etcdIPs
 	kubeadm.PodSubnet = subnet
 	kubeadm.KubernetesVersion = version
@@ -181,6 +188,7 @@ func init() {
 
 	genCmd.Flags().StringSliceVar(&define.KubeFlags.EtcdIPs, "etcd", []string{"127.0.0.1"}, "etcd ips")
 	genCmd.Flags().StringSliceVar(&define.KubeFlags.MasterIPs, "master", []string{"127.0.0.1"}, "master ips")
+	genCmd.Flags().StringSliceVar(&define.KubeFlags.OtherAPIServerCertSANs, "cert-sans", []string{}, "other api server cert sans, like floating ips")
 	genCmd.Flags().StringVar(&define.KubeFlags.LoadbalanceIP, "loadbalance", "127.0.0.1", "loadbalance ip")
 	genCmd.Flags().StringVar(&define.KubeFlags.LoadbalancePort, "loadbalance-port", ":6444", "loadbalance port")
 	genCmd.Flags().StringVar(&define.KubeFlags.EtcdImage, "etcd-image", "gcr.io/google_containers/etcd-amd64:3.0.17", "etcd docker image")

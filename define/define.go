@@ -100,18 +100,19 @@ type HaproxyTempST struct {
 
 //Flags is
 type Flags struct {
-	MasterIPs         []string
-	EtcdIPs           []string
-	MasterEndPoints   []string
-	APIServerCertSANs []string
-	PodSubnet         string
-	KubernetesVersion string
-	LoadbalancePort   string
-	LoadbalanceIP     string
-	Apply             bool
-	EtcdImage         string
-	Version           string
-	Subnet            string
+	MasterIPs              []string
+	OtherAPIServerCertSANs []string
+	EtcdIPs                []string
+	MasterEndPoints        []string
+	APIServerCertSANs      []string
+	PodSubnet              string
+	KubernetesVersion      string
+	LoadbalancePort        string
+	LoadbalanceIP          string
+	Apply                  bool
+	EtcdImage              string
+	Version                string
+	Subnet                 string
 
 	// render out compose file and kubeadm config
 	ConfigOutDir string
@@ -127,4 +128,8 @@ var (
 	InitKubeadm         bool
 	InitOtherMasters    bool
 	StartEtcdCluster    bool
+	Distribute          bool
+	Pssh                bool
+	User                string
+	Password            string
 )

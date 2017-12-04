@@ -74,6 +74,68 @@ func applyShell(sh string) {
 	cmd.Run()
 }
 
+func applyShellOutput(sh string) string {
+	s, err := exec.Command("bash", "-c", sh).Output()
+	if err != nil {
+		fmt.Println("exec shell failed: ", sh)
+		return ""
+	}
+	return string(s)
+}
+
+func getCurrentIP() string {
+	shell := `grep server /etc/kubernetes/admin.conf | awk -F "//" '{print $2}' | awk -F ":" '{print $1}'`
+	return applyShellOutput(shell)
+}
+
+func changeConfigFileIPs(ip, dip string) {
+	sh := fmt.Sprintf("sed -i 's/%s/%s/g' ", ip, dip)
+	dir := fmt.Sprintf("/tmp/%s", dip)
+
+	for _, file := range []string{dir + "/manifests/kube-apiserver.yaml", dir + "/kubelet.conf", dir + "./admin.conf", dir + "./controller-manager.conf", dir + "./scheduler.conf"} {
+		applyShell(sh + file)
+	}
+}
+
+func sendFileToDstNode(ip string) {
+	sh := fmt.Sprintf("docker -H %s:2375 run --name %s -v /etc/kubernetes:/etc/kubernetes -v /usr/bin:/usr/bin -v /etc/systemd/system:/etc/systemd/system -v /etc/systemd/system/kubelet.service.d:/etc/systemd/system/kubelet.service.d busybox sleep 36000", ip, ip)
+	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp /tmp/%s/etc/kubernetes %s:/etc/kubernetes ", ip, ip, ip)
+	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kube* %s:/usr/bin ", ip, ip, ip)
+	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp out/kubelet.service %s:/etc/systemd/system ", ip, ip, ip)
+	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp out/10-kubeadm.conf %s:/etc/systemd/system/kubelet.service.d", ip, ip, ip)
+	applyShell(sh)
+
+	//load images
+	sh = fmt.Sprintf("docker -H %s:2375 load image/images.tar", ip)
+	applyShell(sh)
+}
+
+func distributeFiles() {
+	ip := getCurrentIP()
+	for _, masterip := range define.KubeFlags.MasterIPs {
+		dir := fmt.Sprintf("/tmp/%s", masterip)
+		err := os.Mkdir(dir, os.ModePerm)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		sh := fmt.Sprintf("cp -r /etc/kubernetes %s", dir)
+		applyShell(sh)
+
+		// change the currentIP to masterip
+		changeConfigFileIPs(ip, masterip)
+
+		go sendFileToDstNode(masterip)
+	}
+}
+
+func execSSHCommand(user, passwd string) {
+}
+
 //Apply is
 func Apply() {
 	LoadKubeinitConfig()
@@ -94,5 +156,13 @@ func Apply() {
 
 	if define.InitKubeadm {
 		applyShell(initKubeadm)
+	}
+
+	if define.Distribute {
+		distributeFiles()
+	}
+
+	if define.Pssh {
+		execSSHCommand(define.User, define.Password)
 	}
 }

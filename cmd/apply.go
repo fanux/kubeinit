@@ -51,4 +51,9 @@ func init() {
 	applyCmd.Flags().BoolVarP(&define.InitKubeadm, "init-kubeadm", "i", false, "exec kubeadm init")
 	applyCmd.Flags().BoolVarP(&define.StartEtcdCluster, "start-etcd", "e", false, "docker compose up etcd compose files")
 
+	applyCmd.Flags().BoolVarP(&define.Distribute, "distribute", "d", true, "distribute files to other masters and nodes")
+	applyCmd.Flags().BoolVarP(&define.Pssh, "pssh", "p", true, "exec commands on other nodes, this flag needs other nodes passwords")
+
+	applyCmd.Flags().StringVar(&define.Password, "passwd", "", "other nodes passwords")
+	applyCmd.Flags().StringVar(&define.User, "user", "root", "use what use to exec shell commands")
 }
