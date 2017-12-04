@@ -112,6 +112,8 @@ func sendFileToDstNode(ip string) {
 	//load images
 	sh = fmt.Sprintf("docker -H %s:2375 load image/images.tar", ip)
 	applyShell(sh)
+
+	execSSHCommand(define.User, define.Password, ip)
 }
 
 func distributeFiles() {
@@ -133,7 +135,9 @@ func distributeFiles() {
 	}
 }
 
-func execSSHCommand(user, passwd string) {
+func execSSHCommand(user, passwd, ip string) {
+	sh := fmt.Sprintf("sshpass -p %s ssh %s@%s echo", passwd, user, ip)
+	applyShell(sh)
 }
 
 //Apply is
@@ -160,9 +164,5 @@ func Apply() {
 
 	if define.Distribute {
 		distributeFiles()
-	}
-
-	if define.Pssh {
-		execSSHCommand(define.User, define.Password)
 	}
 }
