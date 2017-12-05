@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"strings"
 
 	"github.com/fanux/kubeinit/define"
 )
@@ -170,7 +171,14 @@ func Apply() {
 	}
 
 	if define.InitKubeadm {
-		applyShell(initKubeadm)
+		s := applyShellOutput(initKubeadm)
+		fmt.Println(s)
+		i := strings.Index(s, "kubeadm join")
+		s1 := s[i:]
+		j := strings.Index(s1, "/n")
+		joinCmd := s1[:j+1]
+		fmt.Println("join Cmd is: ", joinCmd)
+		//TODO using this command
 	}
 
 	if define.Distribute {
