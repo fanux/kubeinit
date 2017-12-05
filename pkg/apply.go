@@ -31,6 +31,11 @@ systemctl enable kubelet
 systemctl enable docker
 `
 
+var startKubelet = `
+systemctl enable kubelet
+systemctl start kubelet
+`
+
 var loadDockerImages = `
 docker load -i image/images.tar
 `
@@ -113,12 +118,16 @@ func sendFileToDstNode(ip string) {
 	sh = fmt.Sprintf("docker -H %s:2375 load image/images.tar", ip)
 	applyShell(sh)
 
-	execSSHCommand(define.User, define.Password, ip)
+	execSSHCommand(define.User, define.Password, ip, initbasesh)
+	execSSHCommand(define.User, define.Password, ip, startKubelet)
 }
 
 func distributeFiles() {
 	ip := getCurrentIP()
 	for _, masterip := range define.KubeFlags.MasterIPs {
+		if masterip == ip {
+			continue
+		}
 		dir := fmt.Sprintf("/tmp/%s", masterip)
 		err := os.Mkdir(dir, os.ModePerm)
 		if err != nil {
@@ -135,9 +144,11 @@ func distributeFiles() {
 	}
 }
 
-func execSSHCommand(user, passwd, ip string) {
-	sh := fmt.Sprintf("sshpass -p %s ssh %s@%s echo", passwd, user, ip)
-	applyShell(sh)
+func execSSHCommand(user, passwd, ip, sh string) {
+	cmd := exec.Command("sshpass", "-p", ip, "ssh", user+"@"+passwd, "bash", "-c", sh)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
 }
 
 //Apply is

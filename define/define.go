@@ -101,6 +101,7 @@ type HaproxyTempST struct {
 //Flags is
 type Flags struct {
 	MasterIPs              []string
+	NodeIPs                []string
 	OtherAPIServerCertSANs []string
 	EtcdIPs                []string
 	MasterEndPoints        []string

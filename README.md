@@ -5,7 +5,8 @@ TODO
 ```
 $ kubeinit gen --master 1.1.1.2 --master 1.1.1.3 --master 1.1.1.4 \
                --etcd  1.1.1.2 --etcd 1.1.1.3 --etcd 1.1.1.4 \
-               --loadbalance 1.1.1.2 --apply
+               --loadbalance 1.1.1.2 --apply \
+               --node 1.1.1.5 --node 1.1.1.6 --node 1.1.1.7 
 ```
 --apply 生成配置立即执行 kubeinit apply, 不加这个参数只生成一些配置文件，方便定制需求去修改配置，修改完再apply
 
@@ -28,3 +29,4 @@ $ kubeinit apply -bie
 - [ ] 自动初始化其它master节点配置
 - [ ] 自动启动etcd集群，master集群
 - [ ] 自动启动loadbalance
+- [ ] 自动join node节点

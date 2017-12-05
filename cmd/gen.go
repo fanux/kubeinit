@@ -195,6 +195,7 @@ func init() {
 	genCmd.Flags().BoolVarP(&define.KubeFlags.Apply, "apply", "a", false, "apply directly")
 	genCmd.Flags().StringVar(&define.KubeFlags.Subnet, "pod-subnet", "10.122.0.0/16", "pod subnet")
 	genCmd.Flags().StringVar(&define.KubeFlags.Version, "version", "v1.8.4", "kubernetes version")
+	genCmd.Flags().StringSliceVar(&define.KubeFlags.NodeIPs, "node", []string{}, "node ips")
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
 	// genCmd.PersistentFlags().String("foo", "", "A help for foo")
