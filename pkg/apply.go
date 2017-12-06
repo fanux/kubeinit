@@ -175,10 +175,16 @@ func Apply() {
 		fmt.Println(s)
 		i := strings.Index(s, "kubeadm join")
 		s1 := s[i:]
-		j := strings.Index(s1, "/n")
+		j := strings.Index(s1, "\n")
 		joinCmd := s1[:j+1]
 		fmt.Println("join Cmd is: ", joinCmd)
-		//TODO using this command
+		//apply join commands
+		for _, ip := range define.KubeFlags.NodeIPs {
+			go func(ip string) {
+				execSSHCommand(define.User, define.Password, ip, initbasesh)
+				execSSHCommand(define.User, define.Password, ip, joinCmd)
+			}(ip)
+		}
 	}
 
 	if define.Distribute {

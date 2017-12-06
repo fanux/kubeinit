@@ -190,7 +190,7 @@ func init() {
 	genCmd.Flags().StringSliceVar(&define.KubeFlags.MasterIPs, "master", []string{"127.0.0.1"}, "master ips")
 	genCmd.Flags().StringSliceVar(&define.KubeFlags.OtherAPIServerCertSANs, "cert-sans", []string{}, "other api server cert sans, like floating ips")
 	genCmd.Flags().StringVar(&define.KubeFlags.LoadbalanceIP, "loadbalance", "127.0.0.1", "loadbalance ip")
-	genCmd.Flags().StringVar(&define.KubeFlags.LoadbalancePort, "loadbalance-port", ":6444", "loadbalance port")
+	genCmd.Flags().StringVar(&define.KubeFlags.LoadbalancePort, "loadbalance-port", "6444", "loadbalance port")
 	genCmd.Flags().StringVar(&define.KubeFlags.EtcdImage, "etcd-image", "gcr.io/google_containers/etcd-amd64:3.0.17", "etcd docker image")
 	genCmd.Flags().BoolVarP(&define.KubeFlags.Apply, "apply", "a", false, "apply directly")
 	genCmd.Flags().StringVar(&define.KubeFlags.Subnet, "pod-subnet", "10.122.0.0/16", "pod subnet")

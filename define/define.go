@@ -82,7 +82,7 @@ defaults
   timeout server    50s
 
 frontend k8s
-  bind *:{{.LoadbalancePort}}
+  bind *{{.LoadbalancePort}}
   mode tcp
   default_backend k8s-backend
 
