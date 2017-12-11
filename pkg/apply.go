@@ -75,6 +75,7 @@ func LoadKubeinitConfig() {
 }
 
 func applyShell(sh string) {
+	fmt.Println("apply cmd: ", sh)
 	cmd := exec.Command("bash", "-c", sh)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -99,7 +100,7 @@ func changeConfigFileIPs(ip, dip string) {
 	sh := fmt.Sprintf("sed -i 's/%s/%s/g' ", ip, dip)
 	dir := fmt.Sprintf("/tmp/%s", dip)
 
-	for _, file := range []string{dir + "/manifests/kube-apiserver.yaml", dir + "/kubelet.conf", dir + "./admin.conf", dir + "./controller-manager.conf", dir + "./scheduler.conf"} {
+	for _, file := range []string{dir + "/manifests/kube-apiserver.yaml", dir + "/kubelet.conf", dir + "/admin.conf", dir + "/controller-manager.conf", dir + "/scheduler.conf"} {
 		applyShell(sh + file)
 	}
 }
