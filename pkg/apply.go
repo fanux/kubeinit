@@ -98,7 +98,7 @@ func getCurrentIP() string {
 
 func changeConfigFileIPs(ip, dip string) {
 	sh := fmt.Sprintf("sed -i 's/%s/%s/g' ", ip, dip)
-	dir := fmt.Sprintf("/tmp/%s", dip)
+	dir := fmt.Sprintf("/tmp/%s/kubernetes", dip)
 
 	for _, file := range []string{dir + "/manifests/kube-apiserver.yaml", dir + "/kubelet.conf", dir + "/admin.conf", dir + "/controller-manager.conf", dir + "/scheduler.conf"} {
 		applyShell(sh + file)
