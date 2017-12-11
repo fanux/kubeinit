@@ -46,6 +46,7 @@ var startEtcdCluster = "docker-compose -H %s:2375 -f out/etcd-docker-compose-%d.
 var initKubeadm = `
 kubeadm init --config out/kubeadm.yaml
 mkdir -p $HOME/.kube
+rm -f $HOME/.kube/config
 cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 kubectl apply -f out/calico.yaml
 `
