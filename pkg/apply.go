@@ -127,6 +127,8 @@ func sendFileToDstNode(ip string) {
 
 func distributeFiles() {
 	ip := getCurrentIP()
+	i := string.Index(ip, "\n")
+	ip = ip[:i]
 	for _, masterip := range define.KubeFlags.MasterIPs {
 		if masterip == ip {
 			continue
