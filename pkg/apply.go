@@ -198,8 +198,8 @@ func Apply() {
 	}
 
 	if define.Distribute {
-		execSSHCommand(define.User, define.Password, "10.1.245.92", "echo 123>>test")
-		execSSHCommand(define.User, define.Password, "10.1.245.92", "echo 123\necho 4565>>test2")
+		execSSHCommand(define.User, define.Password, "10.1.245.92", "echo 123>>/root/test")
+		execSSHCommand(define.User, define.Password, "10.1.245.92", "echo 123 >>/root/test3 && echo 4565>>/root/test2")
 		distributeFiles()
 	}
 
