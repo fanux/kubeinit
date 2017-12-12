@@ -19,8 +19,8 @@ EOF
 sysctl --system
 
 swapoff -a
-setenforce 0
-systemctl stop firewarlld
+setenforce 0 || true
+systemctl stop firewarlld || true
 `
 
 var cpBinAndConfigs = `
@@ -153,7 +153,7 @@ func distributeFiles() {
 func execSSHCommand(user, passwd, ip, sh string) {
 	//rsh := fmt.Sprintf("bash -c %s", sh)
 	fmt.Println("exec ssh command: ", sh)
-	cmd := exec.Command("sshpass", "-p", passwd, "ssh", user+"@"+ip, "\""+sh+"\"")
+	cmd := exec.Command("sshpass", "-p", passwd, "ssh", user+"@"+ip, sh)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
