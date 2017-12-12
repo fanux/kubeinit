@@ -162,7 +162,6 @@ func execSSHCommand(user, passwd, ip, sh string) {
 //Apply is
 func Apply() {
 	LoadKubeinitConfig()
-	execSSHCommand(define.User, define.Password, ip, "echo 123\necho 4565")
 
 	if define.InitBaseEnvironment {
 		applyShell(initbasesh)
@@ -189,6 +188,7 @@ func Apply() {
 		//apply join commands
 		for _, ip := range define.KubeFlags.NodeIPs {
 			go func(ip string) {
+				execSSHCommand(define.User, define.Password, ip, "echo 123\necho 4565")
 				execSSHCommand(define.User, define.Password, ip, initbasesh)
 				execSSHCommand(define.User, define.Password, ip, joinCmd)
 			}(ip)
