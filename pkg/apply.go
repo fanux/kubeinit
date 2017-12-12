@@ -150,7 +150,8 @@ func distributeFiles() {
 }
 
 func execSSHCommand(user, passwd, ip, sh string) {
-	cmd := exec.Command("sshpass", "-p", passwd, "ssh", user+"@"+ip, "\"bash", "-c", sh+"\"")
+	rsh := fmt.Sprintf("\"bash -c %s\"", sh)
+	cmd := exec.Command("sshpass", "-p", passwd, "ssh", user+"@"+ip, rsh)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
