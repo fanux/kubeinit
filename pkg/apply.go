@@ -106,9 +106,9 @@ func changeConfigFileIPs(ip, dip string) {
 }
 
 func sendFileToDstNode(ip string) {
-	sh := fmt.Sprintf("docker -H %s:2375 run --name %s -v /etc/kubernetes:/etc/kubernetes -v /usr/bin:/usr/bin -v /etc/systemd/system:/etc/systemd/system -v /etc/systemd/system/kubelet.service.d:/etc/systemd/system/kubelet.service.d busybox sleep 36000", ip, ip)
+	sh := fmt.Sprintf("docker -H %s:2375 run --name %s -v /etc:/etc -v /usr/bin:/usr/bin -v /etc/systemd/system:/etc/systemd/system -v /etc/systemd/system/kubelet.service.d:/etc/systemd/system/kubelet.service.d busybox sleep 36000", ip, ip)
 	applyShell(sh)
-	sh = fmt.Sprintf("docker -H %s:2375 cp /tmp/%s/kubernetes/* %s:/etc/kubernetes ", ip, ip, ip)
+	sh = fmt.Sprintf("docker -H %s:2375 cp /tmp/%s/kubernetes %s:/etc", ip, ip, ip)
 	applyShell(sh)
 	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kube* %s:/usr/bin ", ip, ip)
 	applyShell(sh)
