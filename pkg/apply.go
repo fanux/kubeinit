@@ -110,11 +110,11 @@ func sendFileToDstNode(ip string) {
 	applyShell(sh)
 	sh = fmt.Sprintf("docker -H %s:2375 cp /tmp/%s/kubernetes %s:/etc/kubernetes ", ip, ip, ip)
 	applyShell(sh)
-	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kube* %s:/usr/bin ", ip, ip, ip)
+	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kube* %s:/usr/bin ", ip, ip)
 	applyShell(sh)
-	sh = fmt.Sprintf("docker -H %s:2375 cp out/kubelet.service %s:/etc/systemd/system ", ip, ip, ip)
+	sh = fmt.Sprintf("docker -H %s:2375 cp out/kubelet.service %s:/etc/systemd/system ", ip, ip)
 	applyShell(sh)
-	sh = fmt.Sprintf("docker -H %s:2375 cp out/10-kubeadm.conf %s:/etc/systemd/system/kubelet.service.d", ip, ip, ip)
+	sh = fmt.Sprintf("docker -H %s:2375 cp out/10-kubeadm.conf %s:/etc/systemd/system/kubelet.service.d", ip, ip)
 	applyShell(sh)
 
 	//load images
