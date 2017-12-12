@@ -198,5 +198,5 @@ func Apply() {
 	}
 
 	var wait chan int
-	w := <-wait
+	<-wait
 }
