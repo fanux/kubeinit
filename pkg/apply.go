@@ -145,12 +145,14 @@ func distributeFiles() {
 		// change the currentIP to masterip
 		changeConfigFileIPs(ip, masterip)
 
-		go sendFileToDstNode(masterip)
+		//go sendFileToDstNode(masterip)
+		sendFileToDstNode(masterip)
 	}
 }
 
 func execSSHCommand(user, passwd, ip, sh string) {
 	//rsh := fmt.Sprintf("bash -c %s", sh)
+	fmt.Println("exec ssh command: ", sh)
 	cmd := exec.Command("sshpass", "-p", passwd, "ssh", user+"@"+ip, "\""+sh+"\"")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -172,7 +174,6 @@ func Apply() {
 	if define.StartEtcdCluster {
 		for i, ip := range define.KubeFlags.EtcdIPs {
 			sh := fmt.Sprintf(startEtcdCluster, ip, i)
-			fmt.Println("apply etcd: ", sh)
 			applyShell(sh)
 		}
 	}
@@ -186,16 +187,19 @@ func Apply() {
 		joinCmd := s1[:j+1]
 		fmt.Println("join Cmd is: ", joinCmd)
 		//apply join commands
-		for _, ip := range define.KubeFlags.NodeIPs {
-			go func(ip string) {
-				execSSHCommand(define.User, define.Password, ip, initbasesh)
-				execSSHCommand(define.User, define.Password, ip, joinCmd)
-			}(ip)
-		}
+		/*
+			for _, ip := range define.KubeFlags.NodeIPs {
+				go func(ip string) {
+					execSSHCommand(define.User, define.Password, ip, initbasesh)
+					execSSHCommand(define.User, define.Password, ip, joinCmd)
+				}(ip)
+			}
+		*/
 	}
 
 	if define.Distribute {
-		execSSHCommand(define.User, define.Password, "10.1.245.92", "echo 123\necho 4565")
+		execSSHCommand(define.User, define.Password, "10.1.245.92", "echo 123>>test")
+		execSSHCommand(define.User, define.Password, "10.1.245.92", "echo 123\necho 4565>>test2")
 		distributeFiles()
 	}
 
