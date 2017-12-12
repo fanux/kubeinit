@@ -196,4 +196,7 @@ func Apply() {
 	if define.Distribute {
 		distributeFiles()
 	}
+
+	var wait chan int
+	w := <-wait
 }
