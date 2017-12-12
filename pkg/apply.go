@@ -188,7 +188,6 @@ func Apply() {
 		//apply join commands
 		for _, ip := range define.KubeFlags.NodeIPs {
 			go func(ip string) {
-				execSSHCommand(define.User, define.Password, ip, "echo 123\necho 4565")
 				execSSHCommand(define.User, define.Password, ip, initbasesh)
 				execSSHCommand(define.User, define.Password, ip, joinCmd)
 			}(ip)
@@ -196,6 +195,7 @@ func Apply() {
 	}
 
 	if define.Distribute {
+		execSSHCommand(define.User, define.Password, "10.1.245.92", "echo 123\necho 4565")
 		distributeFiles()
 	}
 
