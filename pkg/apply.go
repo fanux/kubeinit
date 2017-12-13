@@ -227,14 +227,13 @@ func Apply() {
 		}
 	}
 
-	if define.Distribute {
-		distributeFiles()
-	}
-
 	applyLoadBalance(define.KubeFlags.LoadbalanceIP)
 
 	if define.InitKubeadm {
 		s := applyShellOutput(initKubeadm)
+		if define.Distribute {
+			distributeFiles()
+		}
 		fmt.Println(s)
 		i := strings.Index(s, "kubeadm join")
 		s1 := s[i:]
