@@ -105,13 +105,19 @@ func changeConfigFileIPs(ip, dip string) {
 	}
 }
 
-func sendFileToDstNode(ip string) {
-	sh := fmt.Sprintf("docker -H %s:2375 run --name %s -v /etc:/etc -v /usr/bin:/usr/bin -v /etc/systemd/system:/etc/systemd/system -v /etc/systemd/system/kubelet.service.d:/etc/systemd/system/kubelet.service.d busybox sleep 36000", ip, ip)
+func sendFileToDstMaster(ip string) {
+	sh := fmt.Sprintf("docker -H %s:2375 run --name %s -v /etc:/etc -v /usr/bin:/usr/bin -v /etc/systemd/system:/etc/systemd/system -v /etc/systemd/system/kubelet.service.d:/etc/systemd/system/kubelet.service.d busybox", ip, ip)
 	applyShell(sh)
 	sh = fmt.Sprintf("docker -H %s:2375 cp /tmp/%s/kubernetes %s:/etc", ip, ip, ip)
 	applyShell(sh)
-	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kube* %s:/usr/bin ", ip, ip)
+
+	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kubectl %s:/usr/bin ", ip, ip)
 	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kubelet %s:/usr/bin ", ip, ip)
+	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kubeadm %s:/usr/bin ", ip, ip)
+	applyShell(sh)
+
 	sh = fmt.Sprintf("docker -H %s:2375 cp out/kubelet.service %s:/etc/systemd/system ", ip, ip)
 	applyShell(sh)
 	sh = fmt.Sprintf("docker -H %s:2375 cp out/10-kubeadm.conf %s:/etc/systemd/system/kubelet.service.d", ip, ip)
@@ -123,6 +129,27 @@ func sendFileToDstNode(ip string) {
 
 	execSSHCommand(define.User, define.Password, ip, initbasesh)
 	execSSHCommand(define.User, define.Password, ip, startKubelet)
+}
+
+func sendFileToDstNode(ip string) {
+	sh := fmt.Sprintf("docker -H %s:2375 run --name %s-node  -v /usr/bin:/usr/bin -v /etc/systemd/system:/etc/systemd/system -v /etc/systemd/system/kubelet.service.d:/etc/systemd/system/kubelet.service.d busybox", ip, ip)
+	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kubectl %s-node:/usr/bin ", ip, ip)
+	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kubelet %s-node:/usr/bin ", ip, ip)
+	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kubeadm %s-node:/usr/bin ", ip, ip)
+	applyShell(sh)
+
+	sh = fmt.Sprintf("docker -H %s:2375 cp out/kubelet.service %s-node:/etc/systemd/system ", ip, ip)
+	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp out/10-kubeadm.conf %s-node:/etc/systemd/system/kubelet.service.d", ip, ip)
+	applyShell(sh)
+
+	//load images
+	sh = fmt.Sprintf("docker -H %s:2375 load -i image/images.tar", ip)
+	applyShell(sh)
+
 }
 
 func distributeFiles() {
@@ -145,8 +172,8 @@ func distributeFiles() {
 		// change the currentIP to masterip
 		changeConfigFileIPs(ip, masterip)
 
-		//go sendFileToDstNode(masterip)
-		sendFileToDstNode(masterip)
+		//go sendFileToDstMaster(masterip)
+		sendFileToDstMaster(masterip)
 	}
 }
 
@@ -159,6 +186,28 @@ func execSSHCommand(user, passwd, ip, sh string) {
 	if err := cmd.Run(); err != nil {
 		fmt.Printf("exec ssh command error: %s", err)
 	}
+}
+
+func applyLoadBalance(ip string) {
+	//docker cp haproxy.cfg to remote host
+	sh := fmt.Sprintf("docker -H %s:2375 run --name %s-ha -v /etc/haproxy:/etc/haproxy busybox", ip, ip)
+	applyShell(sh)
+	sh = fmt.Sprintf("docker -H %s:2375 cp out/haproxy.cfg %s-ha:/etc/haproxy", ip, ip)
+	applyShell(sh)
+
+	//start haproxy container
+	sh = fmt.Sprintf("docker -H %s:2375 run --net=host -v /etc/haproxy:/usr/local/etc/haproxy --name ha -d haproxy:1.7 ", ip)
+	applyShell(sh)
+}
+
+func changeTOLBIPPort(cmd string) string {
+	for _, masterip := range define.KubeFlags.MasterIPs {
+		if strings.Contains(cmd, masterip) {
+			return strings.Replace(cmd, masterip+":6443", define.KubeFlags.LoadbalanceIP+":"+define.KubeFlags.LoadbalancePort, -1)
+		}
+	}
+	fmt.Println("Error: change LoadbalanceIP failed: ", define.KubeFlags.LoadbalanceIP+":"+define.KubeFlags.LoadbalancePort)
+	return cmd
 }
 
 //Apply is
@@ -178,6 +227,12 @@ func Apply() {
 		}
 	}
 
+	if define.Distribute {
+		distributeFiles()
+	}
+
+	applyLoadBalance(define.KubeFlags.LoadbalanceIP)
+
 	if define.InitKubeadm {
 		s := applyShellOutput(initKubeadm)
 		fmt.Println(s)
@@ -186,23 +241,20 @@ func Apply() {
 		j := strings.Index(s1, "\n")
 		joinCmd := s1[:j+1]
 		fmt.Println("join Cmd is: ", joinCmd)
+		joinCmd = changeTOLBIPPort(joinCmd)
 		//apply join commands
-		/*
-			for _, ip := range define.KubeFlags.NodeIPs {
-				go func(ip string) {
-					execSSHCommand(define.User, define.Password, ip, initbasesh)
-					execSSHCommand(define.User, define.Password, ip, joinCmd)
-				}(ip)
-			}
-		*/
-	}
-
-	if define.Distribute {
-		execSSHCommand(define.User, define.Password, "10.1.245.92", "echo 123>>/root/test")
-		execSSHCommand(define.User, define.Password, "10.1.245.92", "echo 123 >>/root/test3 && echo 4565>>/root/test2")
-		distributeFiles()
+		for _, ip := range define.KubeFlags.NodeIPs {
+			go func(ip string) {
+				//send files to node
+				sendFileToDstNode(ip)
+				execSSHCommand(define.User, define.Password, ip, initbasesh)
+				execSSHCommand(define.User, define.Password, ip, joinCmd)
+			}(ip)
+		}
 	}
 
 	var wait chan int
 	<-wait
+	//set .kube/config
+	//TODO kubectl config set-cluster kubernetes --server=https://47.52.227.242:6444 --kubeconfig=$HOME/.kube/config
 }
