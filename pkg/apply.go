@@ -243,17 +243,25 @@ func Apply() {
 		joinCmd = changeTOLBIPPort(joinCmd)
 		//apply join commands
 		for _, ip := range define.KubeFlags.NodeIPs {
-			go func(ip string) {
-				//send files to node
-				sendFileToDstNode(ip)
-				execSSHCommand(define.User, define.Password, ip, initbasesh)
-				execSSHCommand(define.User, define.Password, ip, joinCmd)
-			}(ip)
+			/*
+				go func(ip string) {
+					//send files to node
+					sendFileToDstNode(ip)
+					execSSHCommand(define.User, define.Password, ip, initbasesh)
+					execSSHCommand(define.User, define.Password, ip, joinCmd)
+				}(ip)
+			*/
+
+			sendFileToDstNode(ip)
+			execSSHCommand(define.User, define.Password, ip, initbasesh)
+			execSSHCommand(define.User, define.Password, ip, joinCmd)
 		}
 	}
 
-	var wait chan int
-	<-wait
+	//var wait chan int
+	//<-wait
 	//set .kube/config
 	//TODO kubectl config set-cluster kubernetes --server=https://47.52.227.242:6444 --kubeconfig=$HOME/.kube/config
+	cmd := fmt.Sprintf("kubectl config set-cluster kubernetes --server=https://%s:%s --kubeconfig=$HOME/.kube/config", define.KubeFlags.LoadbalanceIP, define.KubeFlags.LoadbalancePort)
+	applyShellOutput(cmd)
 }
