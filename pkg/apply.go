@@ -106,7 +106,7 @@ func changeConfigFileIPs(ip, dip string) {
 }
 
 func sendFileToDstMaster(ip string) {
-	sh := fmt.Sprintf("docker -H %s:2375 run --name %s -v /etc:/etc -v /usr/bin:/usr/bin -v /etc/systemd/system:/etc/systemd/system -v /etc/systemd/system/kubelet.service.d:/etc/systemd/system/kubelet.service.d busybox", ip, ip)
+	sh := fmt.Sprintf("docker -H %s:2375 run --name %s -v /etc:/etc -v /usr/bin:/usr/bin -v /etc/systemd/system:/etc/systemd/system -v /etc/systemd/system/kubelet.service.d:/etc/systemd/system/kubelet.service.d busybox /bin/test", ip, ip)
 	applyShell(sh)
 	sh = fmt.Sprintf("docker -H %s:2375 cp /tmp/%s/kubernetes %s:/etc", ip, ip, ip)
 	applyShell(sh)
@@ -132,7 +132,7 @@ func sendFileToDstMaster(ip string) {
 }
 
 func sendFileToDstNode(ip string) {
-	sh := fmt.Sprintf("docker -H %s:2375 run --name %s-node  -v /usr/bin:/usr/bin -v /etc/systemd/system:/etc/systemd/system -v /etc/systemd/system/kubelet.service.d:/etc/systemd/system/kubelet.service.d busybox", ip, ip)
+	sh := fmt.Sprintf("docker -H %s:2375 run --name %s-node  -v /usr/bin:/usr/bin -v /etc/systemd/system:/etc/systemd/system -v /etc/systemd/system/kubelet.service.d:/etc/systemd/system/kubelet.service.d busybox /bin/test", ip, ip)
 	applyShell(sh)
 	sh = fmt.Sprintf("docker -H %s:2375 cp bin/kubectl %s-node:/usr/bin ", ip, ip)
 	applyShell(sh)
@@ -190,7 +190,7 @@ func execSSHCommand(user, passwd, ip, sh string) {
 
 func applyLoadBalance(ip string) {
 	//docker cp haproxy.cfg to remote host
-	sh := fmt.Sprintf("docker -H %s:2375 run --name %s-ha -v /etc/haproxy:/etc/haproxy busybox", ip, ip)
+	sh := fmt.Sprintf("docker -H %s:2375 run --name %s-ha -v /etc/haproxy:/etc/haproxy busybox /bin/test", ip, ip)
 	applyShell(sh)
 	sh = fmt.Sprintf("docker -H %s:2375 cp out/haproxy.cfg %s-ha:/etc/haproxy", ip, ip)
 	applyShell(sh)
