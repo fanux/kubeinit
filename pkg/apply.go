@@ -218,6 +218,11 @@ func changeTOLBIPPort(cmd string) string {
 func applyDashboard() {
 }
 
+func applyHeapster() {
+	// kubectl create -f deploy/kube-config/influxdb/
+	//kubectl create -f deploy/kube-config/rbac/heapster-rbac.yaml
+}
+
 //Apply is
 func Apply() {
 	LoadKubeinitConfig()
