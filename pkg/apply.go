@@ -11,6 +11,17 @@ import (
 	"github.com/fanux/kubeinit/define"
 )
 
+var remoteDockerConfig = `
+echo OPTIONS='-H 0.0.0.0:2375 -H unix:///var/run/docker.sock --selinux-enabled --log-driver=journald --signature-verification=false' >> /etc/sysconfig/docker
+`
+
+var sshEnable = `
+cat <<EOF > ~/.ssh/config
+Host *
+  StrictHostKeyChecking no
+EOF
+`
+
 var initbasesh = `
 cat <<EOF >  /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
@@ -133,10 +144,6 @@ func sendFileToDstMaster(ip string) {
 	sh = fmt.Sprintf("docker -H %s:2375 cp out/10-kubeadm.conf %s:/etc/systemd/system/kubelet.service.d", ip, ip)
 	applyShell(sh)
 
-	//load images
-	sh = fmt.Sprintf("docker -H %s:2375 load -i image/images.tar", ip)
-	applyShell(sh)
-
 	execSSHCommand(define.User, define.Password, ip, initbasesh)
 	execSSHCommand(define.User, define.Password, ip, startKubelet)
 }
@@ -155,11 +162,6 @@ func sendFileToDstNode(ip string) {
 	applyShell(sh)
 	sh = fmt.Sprintf("docker -H %s:2375 cp out/10-kubeadm.conf %s-node:/etc/systemd/system/kubelet.service.d", ip, ip)
 	applyShell(sh)
-
-	//load images
-	sh = fmt.Sprintf("docker -H %s:2375 load -i image/images.tar", ip)
-	applyShell(sh)
-
 }
 
 func distributeFiles() {
@@ -167,6 +169,7 @@ func distributeFiles() {
 	i := strings.Index(ip, "\n")
 	ip = ip[:i]
 	for _, masterip := range define.KubeFlags.MasterIPs {
+		loadRemoteImage(masterip)
 		if masterip == ip {
 			continue
 		}
@@ -230,8 +233,14 @@ func applyHeapster() {
 	applyShellOutput(applyHeapsters)
 }
 
+func loadRemoteImage(ip string) {
+	sh := fmt.Sprintf("docker -H %s:2375 load -i image/images.tar", ip)
+	applyShellOutput(sh)
+}
+
 //Apply is
 func Apply() {
+	applyShellOutput(sshEnable)
 	LoadKubeinitConfig()
 
 	if define.InitBaseEnvironment {
@@ -242,12 +251,11 @@ func Apply() {
 
 	if define.StartEtcdCluster {
 		for i, ip := range define.KubeFlags.EtcdIPs {
+			loadRemoteImage(ip)
 			sh := fmt.Sprintf(startEtcdCluster, ip, i)
 			applyShell(sh)
 		}
 	}
-
-	applyLoadBalance(define.KubeFlags.LoadbalanceIP)
 
 	if define.InitKubeadm {
 		s := applyShellOutput(initKubeadm)
@@ -273,13 +281,13 @@ func Apply() {
 					execSSHCommand(define.User, define.Password, ip, joinCmd)
 				}(ip)
 			*/
-
+			loadRemoteImage(ip)
 			sendFileToDstNode(ip)
 			execSSHCommand(define.User, define.Password, ip, initbasesh)
 			execSSHCommand(define.User, define.Password, ip, joinCmd)
 		}
 	}
-
+	applyLoadBalance(define.KubeFlags.LoadbalanceIP)
 	applyHeapster()
 	//var wait chan int
 	//<-wait
