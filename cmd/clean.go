@@ -20,6 +20,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var cleanSh = `
+kubeadm reset
+rm -rf /var/etcd
+rm -rf /var/lib/etcd
+rm -rf /data/etcd-data.etcd
+`
+
 // cleanCmd represents the clean command
 var cleanCmd = &cobra.Command{
 	Use:   "clean",

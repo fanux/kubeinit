@@ -56,6 +56,11 @@ kubectl apply -f out/kubernetes-dashboard.yaml
 kubectl apply -f out/dashboard-admin.yaml
 `
 
+var applyHeapsters = `
+kubectl create -f out/deploy/kube-config/influxdb/
+kubectl create -f out/deploy/kube-config/rbac/heapster-rbac.yaml
+`
+
 //WriteFile is
 func WriteFile(fileName string, content string) {
 	b := []byte(content)
@@ -216,11 +221,13 @@ func changeTOLBIPPort(cmd string) string {
 }
 
 func applyDashboard() {
+	applyShellOutput(applyDashboardAndAdmin)
 }
 
 func applyHeapster() {
 	// kubectl create -f deploy/kube-config/influxdb/
 	//kubectl create -f deploy/kube-config/rbac/heapster-rbac.yaml
+	applyShellOutput(applyHeapsters)
 }
 
 //Apply is
@@ -273,6 +280,7 @@ func Apply() {
 		}
 	}
 
+	applyHeapster()
 	//var wait chan int
 	//<-wait
 	//set .kube/config
