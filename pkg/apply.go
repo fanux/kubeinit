@@ -260,16 +260,16 @@ func Apply() {
 
 	if define.InitKubeadm {
 		s := applyShellOutput(initKubeadm)
+		fmt.Println(s)
 		if define.Distribute {
 			distributeFiles()
 		}
-		fmt.Println(s)
 		i := strings.Index(s, "kubeadm join")
 		s1 := s[i:]
 		j := strings.Index(s1, "\n")
 		joinCmd := s1[:j+1]
-		fmt.Println("join Cmd is: ", joinCmd)
 		joinCmd = changeTOLBIPPort(joinCmd)
+		fmt.Println("join Cmd is: ", joinCmd)
 
 		loadRemoteImage(define.KubeFlags.LoadbalanceIP)
 		applyLoadBalance(define.KubeFlags.LoadbalanceIP)
