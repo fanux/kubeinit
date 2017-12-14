@@ -51,6 +51,11 @@ cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 kubectl apply -f out/calico.yaml
 `
 
+var applyDashboardAndAdmin = `
+kubectl apply -f out/kubernetes-dashboard.yaml
+kubectl apply -f out/dashboard-admin.yaml
+`
+
 //WriteFile is
 func WriteFile(fileName string, content string) {
 	b := []byte(content)
@@ -210,6 +215,9 @@ func changeTOLBIPPort(cmd string) string {
 	return cmd
 }
 
+func applyDashboard() {
+}
+
 //Apply is
 func Apply() {
 	LoadKubeinitConfig()
@@ -241,6 +249,8 @@ func Apply() {
 		joinCmd := s1[:j+1]
 		fmt.Println("join Cmd is: ", joinCmd)
 		joinCmd = changeTOLBIPPort(joinCmd)
+
+		applyDashboard()
 		//apply join commands
 		for _, ip := range define.KubeFlags.NodeIPs {
 			/*
