@@ -96,7 +96,7 @@ func LoadKubeinitConfig() {
 }
 
 func applyShell(sh string) {
-	fmt.Println("apply cmd: ", sh)
+	fmt.Println("+ ", sh)
 	cmd := exec.Command("bash", "-c", sh)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -104,6 +104,7 @@ func applyShell(sh string) {
 }
 
 func applyShellOutput(sh string) string {
+	fmt.Println("+ ", sh)
 	s, err := exec.Command("bash", "-c", sh).Output()
 	if err != nil {
 		fmt.Println("exec shell failed: ", sh)
@@ -224,23 +225,23 @@ func changeTOLBIPPort(cmd string) string {
 }
 
 func applyDashboard() {
-	applyShellOutput(applyDashboardAndAdmin)
+	applyShell(applyDashboardAndAdmin)
 }
 
 func applyHeapster() {
 	// kubectl create -f deploy/kube-config/influxdb/
 	//kubectl create -f deploy/kube-config/rbac/heapster-rbac.yaml
-	applyShellOutput(applyHeapsters)
+	applyShell(applyHeapsters)
 }
 
 func loadRemoteImage(ip string) {
 	sh := fmt.Sprintf("docker -H %s:2375 load -i image/images.tar", ip)
-	applyShellOutput(sh)
+	applyShell(sh)
 }
 
 //Apply is
 func Apply() {
-	applyShellOutput(sshEnable)
+	applyShell(sshEnable)
 	LoadKubeinitConfig()
 
 	if define.InitBaseEnvironment {
@@ -270,6 +271,8 @@ func Apply() {
 		fmt.Println("join Cmd is: ", joinCmd)
 		joinCmd = changeTOLBIPPort(joinCmd)
 
+		loadRemoteImage(define.KubeFlags.LoadbalanceIP)
+		applyLoadBalance(define.KubeFlags.LoadbalanceIP)
 		applyDashboard()
 		//apply join commands
 		for _, ip := range define.KubeFlags.NodeIPs {
@@ -287,12 +290,11 @@ func Apply() {
 			execSSHCommand(define.User, define.Password, ip, joinCmd)
 		}
 	}
-	applyLoadBalance(define.KubeFlags.LoadbalanceIP)
 	applyHeapster()
 	//var wait chan int
 	//<-wait
 	//set .kube/config
 	//TODO kubectl config set-cluster kubernetes --server=https://47.52.227.242:6444 --kubeconfig=$HOME/.kube/config
 	cmd := fmt.Sprintf("kubectl config set-cluster kubernetes --server=https://%s:%s --kubeconfig=$HOME/.kube/config", define.KubeFlags.LoadbalanceIP, define.KubeFlags.LoadbalancePort)
-	applyShellOutput(cmd)
+	applyShell(cmd)
 }
