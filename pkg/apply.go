@@ -284,7 +284,6 @@ func Apply() {
 		execSSHCommand(define.User, define.Password, define.KubeFlags.LoadbalanceIP, remoteDockerConfig)
 		loadRemoteImage(define.KubeFlags.LoadbalanceIP)
 		applyLoadBalance(define.KubeFlags.LoadbalanceIP)
-		applyDashboard()
 		//apply join commands
 		for _, ip := range define.KubeFlags.NodeIPs {
 			/*
@@ -303,6 +302,7 @@ func Apply() {
 		}
 	}
 	applyHeapster()
+	applyDashboard()
 	//var wait chan int
 	//<-wait
 	//set .kube/config
