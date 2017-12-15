@@ -11,8 +11,16 @@ import (
 	"github.com/fanux/kubeinit/define"
 )
 
+var installComposeAndsshPass = `
+chmod +x bin/docker-compose
+cp bin/docker-compose /usr/bin
+cp bin/sshpass /usr/bin
+`
+
 var remoteDockerConfig = `
-echo OPTIONS='-H 0.0.0.0:2375 -H unix:///var/run/docker.sock --selinux-enabled --log-driver=journald --signature-verification=false' >> /etc/sysconfig/docker
+echo OPTIONS=\"-H 0.0.0.0:2375 -H unix:///var/run/docker.sock --selinux-enabled --log-driver=journald --signature-verification=false\" >> /etc/sysconfig/docker || true
+systemctl enable docker
+systemctl restart docker
 `
 
 var sshEnable = `
@@ -242,6 +250,7 @@ func loadRemoteImage(ip string) {
 //Apply is
 func Apply() {
 	applyShell(sshEnable)
+	applyShell(installComposeAndsshPass)
 	LoadKubeinitConfig()
 
 	if define.InitBaseEnvironment {
@@ -252,6 +261,7 @@ func Apply() {
 
 	if define.StartEtcdCluster {
 		for i, ip := range define.KubeFlags.EtcdIPs {
+			execSSHCommand(define.User, define.Password, ip, remoteDockerConfig)
 			loadRemoteImage(ip)
 			sh := fmt.Sprintf(startEtcdCluster, ip, i)
 			applyShell(sh)
@@ -271,6 +281,7 @@ func Apply() {
 		joinCmd = changeTOLBIPPort(joinCmd)
 		fmt.Println("join Cmd is: ", joinCmd)
 
+		execSSHCommand(define.User, define.Password, define.KubeFlags.LoadbalanceIP, remoteDockerConfig)
 		loadRemoteImage(define.KubeFlags.LoadbalanceIP)
 		applyLoadBalance(define.KubeFlags.LoadbalanceIP)
 		applyDashboard()
@@ -284,6 +295,7 @@ func Apply() {
 					execSSHCommand(define.User, define.Password, ip, joinCmd)
 				}(ip)
 			*/
+			execSSHCommand(define.User, define.Password, ip, remoteDockerConfig)
 			loadRemoteImage(ip)
 			sendFileToDstNode(ip)
 			execSSHCommand(define.User, define.Password, ip, initbasesh)
