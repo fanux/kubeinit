@@ -36,4 +36,6 @@ $ kubeinit apply -bie
 - [x] 自动初始化其它master节点配置
 - [x] 自动启动etcd集群，master集群
 - [x] 自动启动loadbalance
-- [x] 自动join node节点
+- [x] 自动join node节点, 修改node join参数为lb
+
+- [x] 安装calico heapster dashboard
