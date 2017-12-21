@@ -1,13 +1,4 @@
 ## before starting
-```
-vim /etc/sysconfig/docker
-OPTIONS='-H 0.0.0.0:2375 -H unix:///var/run/docker.sock --selinux-enabled --log-driver=journald --signature-verification=false'
-```
-or
-```
-echo OPTIONS=\"-H 0.0.0.0:2375 -H unix:///var/run/docker.sock --selinux-enabled --log-driver=journald --signature-verification=false\" >> /etc/sysconfig/docker
-```
-
 ## generate config files
 ```
 $ kubeinit gen --master 1.1.1.2 --master 1.1.1.3 --master 1.1.1.4 \
