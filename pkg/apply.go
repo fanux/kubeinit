@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/fanux/kubeinit/define"
 )
@@ -216,6 +217,8 @@ func applyLoadBalance(ip string) {
 	applyShell(sh)
 	sh = fmt.Sprintf("docker -H %s:2375 cp out/haproxy.cfg %s-ha:/etc/haproxy", ip, ip)
 	applyShell(sh)
+
+	time.Sleep(1 * time.Second)
 
 	//start haproxy container
 	sh = fmt.Sprintf("docker -H %s:2375 run --net=host -v /etc/haproxy:/usr/local/etc/haproxy --name ha -d haproxy:1.7 ", ip)
