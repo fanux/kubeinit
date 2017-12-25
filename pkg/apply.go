@@ -218,7 +218,7 @@ func applyLoadBalance(ip string) {
 	applyShell(sh)
 
 	//start haproxy container
-	sh = fmt.Sprintf("docker -H %s:2375 run --net=host -v /etc/haproxy:/usr/local/etc/haproxy --name ha -d haproxy:1.7 ", ip)
+	sh = fmt.Sprintf("docker -H %s:2375 run --restart=always --net=host -v /etc/haproxy:/usr/local/etc/haproxy --name ha -d haproxy:1.7 ", ip)
 	applyShell(sh)
 }
 
