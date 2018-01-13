@@ -13,4 +13,10 @@ etcd:
 
 networking:
   podSubnet: 10.122.0.0/16
-kubernetesVersion: v1.8.4
+kubernetesVersion: v1.9.1
+
+apiServerExtraArgs:
+  endpoint-reconciler-type: lease
+
+featureGates:
+  CoreDNS: true
