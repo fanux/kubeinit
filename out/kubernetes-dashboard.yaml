@@ -52,6 +52,10 @@ rules:
 - apiGroups: [""]
   resources: ["secrets"]
   verbs: ["create"]
+  # Allow Dashboard to create 'kubernetes-dashboard-settings' config map.
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["create"]
   # Allow Dashboard to get, update and delete Dashboard exclusive secrets.
 - apiGroups: [""]
   resources: ["secrets"]
@@ -67,6 +71,10 @@ rules:
   resources: ["services"]
   resourceNames: ["heapster"]
   verbs: ["proxy"]
+- apiGroups: [""]
+  resources: ["services/proxy"]
+  resourceNames: ["heapster", "http:heapster:", "https:heapster:"]
+  verbs: ["get"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -106,7 +114,7 @@ spec:
     spec:
       containers:
       - name: kubernetes-dashboard
-        image: gcr.io/google_containers/kubernetes-dashboard-amd64:v1.8.0
+        image: gcr.io/google_containers/kubernetes-dashboard-amd64:v1.8.1
         ports:
         - containerPort: 8443
           protocol: TCP
@@ -155,7 +163,5 @@ spec:
   ports:
     - port: 443
       targetPort: 8443
-      nodePort: 32000
-  type: NodePort 
   selector:
     k8s-app: kubernetes-dashboard
