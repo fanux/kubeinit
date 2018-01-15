@@ -1,0 +1,23 @@
+apiVersion: kubeadm.k8s.io/v1alpha1
+kind: MasterConfiguration
+apiServerCertSANs:
+- 172.31.244.231
+- 172.31.244.232
+- 172.31.244.233
+- 172.31.244.234
+- master1
+- master2
+- master3
+- node1
+- 47.75.1.72
+
+etcd:
+  endpoints:
+  - http://172.31.244.232:2379
+
+apiServerExtraArgs:
+  endpoint-reconciler-type: lease
+
+networking:
+  podSubnet: 192.168.0.0/16
+kubernetesVersion: v1.9.1
