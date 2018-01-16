@@ -211,7 +211,9 @@ spec:
               value: "info"
             # Auto-detect the BGP IP address.
             - name: IP
-              value: ""
+              value: "autodetect"
+            - name: IP_AUTODETECTION_METHOD
+              value: "interface=(ens.*)|(eth.*)"
             - name: FELIX_HEALTHENABLED
               value: "true"
           securityContext:
