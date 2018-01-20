@@ -1,3 +1,6 @@
+## 2.0版本说明
+些版本将整个项目重构，让其具备更好的灵活性与扩展性
+
 ## before starting
 ## generate config files
 ```
