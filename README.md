@@ -33,3 +33,4 @@ $ kubeinit apply -bie
 - [x] 自动join node节点, 修改node join参数为lb
 
 - [x] 安装calico heapster dashboard
+
