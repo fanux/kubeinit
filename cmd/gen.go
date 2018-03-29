@@ -19,8 +19,6 @@ import (
 	"fmt"
 	"html/template"
 	"os"
-	"os/exec"
-	"strings"
 
 	"github.com/fanux/kubeinit/define"
 	"github.com/spf13/cobra"
@@ -45,29 +43,6 @@ func stringsIn(s []string, key string) bool {
 	return false
 }
 
-func genKubeAdmConfigFile(etcdIPs []string, masterIPs []string, loadbalanceIP string, loadbalancePort string, subnet string, version string, tp string) {
-	kubeadm := define.KubeadmTempST{}
-	if stringsIn(masterIPs, loadbalanceIP) {
-		kubeadm.APIServerCertSANs = masterIPs
-	} else {
-		kubeadm.APIServerCertSANs = append(masterIPs, loadbalanceIP)
-	}
-	//add other cert sans ips to APIServerCertSANs list
-	for _, ip := range define.KubeFlags.OtherAPIServerCertSANs {
-		if stringsIn(kubeadm.APIServerCertSANs, ip) {
-		} else {
-			kubeadm.APIServerCertSANs = append(kubeadm.APIServerCertSANs, ip)
-		}
-	}
-	kubeadm.EtcdEndPoints = etcdIPs
-	kubeadm.PodSubnet = subnet
-	kubeadm.KubernetesVersion = version
-
-	t := template.New("kubeadmConfig")
-	outfile := fmt.Sprintf("%s/kubeadm.yaml", outDir)
-	Render(t, tp, kubeadm, outfile)
-}
-
 func genLoadbalanceConfigFile(loadbalancePort string, masterIPs []string, tp string) {
 	haproxy := define.HaproxyTempST{
 		loadbalancePort,
@@ -76,23 +51,6 @@ func genLoadbalanceConfigFile(loadbalancePort string, masterIPs []string, tp str
 	t := template.New("haproxy")
 	outfile := fmt.Sprintf("%s/haproxy.cfg", outDir)
 	Render(t, tp, haproxy, outfile)
-}
-
-func genKubeletSystemdConfig(tp string) {
-	driver := "cgroupfs"
-	out, err := exec.Command("docker", "info").Output()
-	outstr := string(out)
-	if err != nil {
-		fmt.Println("run docker info error: ", err)
-	}
-	if strings.Contains(outstr, "cgroupfs") {
-	} else if strings.Contains(outstr, "systemd") {
-		driver = "systemd"
-	}
-
-	t := template.New("systemdConfig")
-	outfile := fmt.Sprintf("%s/10-kubeadm.conf", outDir)
-	Render(t, tp, driver, outfile)
 }
 
 func dumpKubeInitConfig(flags define.Flags) {

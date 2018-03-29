@@ -10,4 +10,10 @@ type Initer interface {
 	Run() error
 	//clean module
 	Clean() error
+	//install offline
+	InstallOffline() error
+	//Install online
+	InstallOnline() error
+	//Save image, config file or bin
+	Save() error
 }

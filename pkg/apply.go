@@ -3,7 +3,6 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -80,15 +79,6 @@ kubectl create -f out/deploy/kube-config/influxdb/
 kubectl create -f out/deploy/kube-config/rbac/heapster-rbac.yaml
 `
 
-//WriteFile is
-func WriteFile(fileName string, content string) {
-	b := []byte(content)
-	err := ioutil.WriteFile(fileName, b, 0644)
-	if err != nil {
-		fmt.Println("write file error", err)
-	}
-}
-
 //LoadKubeinitConfig is
 func LoadKubeinitConfig() {
 	fileName := fmt.Sprintf("out/kubeinit.json")
@@ -102,25 +92,6 @@ func LoadKubeinitConfig() {
 	defer input.Close()
 	json.NewDecoder(input).Decode(&define.KubeFlags)
 }
-
-func applyShell(sh string) {
-	fmt.Println("+ ", sh)
-	cmd := exec.Command("bash", "-c", sh)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Run()
-}
-
-func applyShellOutput(sh string) string {
-	fmt.Println("+ ", sh)
-	s, err := exec.Command("bash", "-c", sh).Output()
-	if err != nil {
-		fmt.Println("exec shell failed: ", sh)
-		return ""
-	}
-	return string(s)
-}
-
 func getCurrentIP() string {
 	shell := `grep server /etc/kubernetes/admin.conf | awk -F "//" '{print $2}' | awk -F ":" '{print $1}'`
 	return applyShellOutput(shell)
