@@ -61,6 +61,9 @@ type Flags struct {
 	ConfigOutDir string
 	// /etc/kubernetes files, this need copy to other nodes, and change ips
 	KubernetesDir string
+
+	//download kube bin url
+	DownloadURL string
 }
 
 //KubeFlags is

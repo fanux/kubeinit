@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"io/ioutil"
@@ -10,6 +11,17 @@ import (
 
 //RenderToStr is
 func RenderToStr(t *template.Template, tp string, args interface{}) string {
+	template.Must(t.Parse(tp))
+
+	var buf []byte
+	buffer := bytes.NewBuffer(buf)
+
+	err = t.Execute(buffer, args)
+	if err != nil {
+		fmt.Println("exec template file error: %s", err)
+	}
+	str := buffer.String()
+	return str
 }
 
 //Render is

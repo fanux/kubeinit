@@ -90,7 +90,9 @@ func (e *Kubecore) InstallOffline() error {
 
 //InstallOnline is
 func (e *Kubecore) InstallOnline() error {
-	str := ApplyShellOutput(installOnline)
+	url := define.DownloadURL
+	sh := pkg.RenderToStr(t, installOnlineWgetShTmpl, url)
+	str := ApplyShellOutput(sh)
 	fmt.Println(str)
 	return nil
 }
