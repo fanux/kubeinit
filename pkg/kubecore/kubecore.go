@@ -97,7 +97,9 @@ func (e *Kubecore) InstallOnline() error {
 	return nil
 }
 
-//Save is
+//Save is save bin files to bin dir, and save kubernetes core images
 func (e *Kubecore) Save() error {
+	str := ApplyShellOutput(sh)
+	fmt.Println(str)
 	return nil
 }

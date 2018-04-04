@@ -104,3 +104,10 @@ kubeadm init --config ../out/kube/config
 mkdir ~/.kube
 cp /etc/kubernetes/admin.conf ~/.kube/config
 `
+
+var saveSh = `
+cp /usr/bin/kube* bin
+# TODO this will save all the images
+docker save $(docker images|grep ago|awk '{print $1":"$2}') -o kube-core-images.tar
+mv kube-core-images.tar image/
+`
